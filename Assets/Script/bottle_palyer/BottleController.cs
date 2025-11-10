@@ -62,6 +62,8 @@ public class BottleController : MonoBehaviour
     // original bottle position
     public float moveAmount = 5f;     // koto up/down hobe
     public float moveSpeed = 5f;
+
+    [HideInInspector] public bool isMoving = false;
     private void Awake()
     {
         
@@ -210,15 +212,52 @@ public class BottleController : MonoBehaviour
     bool isPos;
     public void bottleSelected()
     {
-         //transform.position = Vector2.MoveTowards(transform.position, originalPosition + Vector3.up * 5, Time.deltaTime * 5);
+        //transform.position = Vector2.MoveTowards(transform.position, originalPosition + Vector3.up * 5, Time.deltaTime * 5);
         // maybe add some effects here
-        transform.position = originalPosition + Vector3.up * 3f * Time.deltaTime;
+        //transform.position = originalPosition + Vector3.up * 3f * Time.deltaTime;
+        StartCoroutine(MoveBottleUp(originalPosition + Vector3.up * 0.1f));
     }
     public void bottleInselected()
     {
-            //transform.position = Vector2.MoveTowards(transform.position, originalPosition, Time.deltaTime * 5);
+        //transform.position = Vector2.MoveTowards(transform.position, originalPosition, Time.deltaTime * 5);
         // delet those effects 
-        transform.position = originalPosition;
+        //transform.position = originalPosition;
+        StartCoroutine(MoveBottleDown(originalPosition));
+    }
+    IEnumerator MoveBottleUp(Vector3 targetPos)
+    {
+        isMoving = true;
+        float t = 0f;
+        Vector3 startPos = transform.position;
+        float speed = 10; // Using your existing moveSpeed variable (was 5f in the example)
+
+        while (t < 1f)
+        {
+            transform.position = Vector3.Lerp(startPos, targetPos, t);
+            t += Time.deltaTime * speed;
+            yield return null;
+        }
+        transform.position = targetPos;
+        isMoving = false;
+    }
+
+    IEnumerator MoveBottleDown(Vector3 targetPos)
+    {
+        isMoving = true;
+        float t = 0f;
+        Vector3 startPos = transform.position;
+        float speed = 10; // Using your existing moveSpeed variable
+
+        while (t < 1f)
+        {
+            transform.position = Vector3.Lerp(startPos, targetPos, t);
+            t += Time.deltaTime * speed;
+            yield return null;
+        }
+        transform.position = targetPos;
+        isMoving = false;
+
+        GameController.instance.FirstBottle = null;
     }
     public void playpouringSound()
     {
@@ -284,6 +323,7 @@ public class BottleController : MonoBehaviour
 
         transform.GetComponent<SpriteRenderer>().sortingOrder -= 2;
         bottleMaskSR.sortingOrder -= 2;
+        GameController.instance.setTheAbilityTrans(true);
     }
 
 
@@ -337,7 +377,8 @@ public class BottleController : MonoBehaviour
                 }
 
                 //Sent Liquid
-                bottleMaskSR.material.SetFloat("_FillAmount", FillAmountCurve.Evaluate(angleValue));
+                //////////bottleMaskSR.material.SetFloat("_FillAmount", FillAmountCurve.Evaluate(angleValue));
+                bottleMaskSR.material.SetFloat("_FillAmount", Mathf.Max(FillAmountCurve.Evaluate(angleValue), fillamounts[numberOfColorsInBottle - numberOfColorsToTransfer]));
 
 
 
@@ -361,46 +402,96 @@ public class BottleController : MonoBehaviour
         bottleMaskSR.material.SetFloat("_SARM", ScaleAndRotationMultiplierCureve.Evaluate(angleValue));
         bottleMaskSR.material.SetFloat("_FillAmount", FillAmountCurve.Evaluate(angleValue));
 
-        numberOfColorsInBottle -= numberOfColorsToTransfer;
+        //////numberOfColorsInBottle -= numberOfColorsToTransfer;
+        //////bottleControllerRef.numberOfColorsInBottle += numberOfColorsToTransfer;
+
+        ////////  Remove transferred colors from source bottle
+        //////for (int i = 0; i < numberOfColorsToTransfer; i++)
+        //////{
+        //////    bottleColors[numberOfColorsInBottle + i] = Color.clear;   // top colors clear
+        //////}
+
+        ////////  Shift remaining colors downward in array
+        //////for (int i = 0; i < 4; i++)
+        //////{
+        //////    if (bottleColors[i] == Color.clear)
+        //////    {
+        //////        // bubble up next colors
+        //////        for (int j = i; j < 3; j++)
+        //////        {
+        //////            bottleColors[j] = bottleColors[j + 1];
+        //////        }
+        //////        bottleColors[3] = Color.clear;  // last always clear
+        //////    }
+        //////}
+
+        ////////  Update top color and shader
+        //////UpdateColorsOnShader();
+        //////UpadateTopColorValues();
+
+        //////bottleMaskSR.material.SetFloat("_FillAmount", fillamounts[numberOfColorsInBottle]);///////////
+        //////bottleControllerRef.is_ref_full();
+
+        ////////after filling all the bottle now desable line rendrer 
+
+        /////////****************///////
+        //////StopPouringSound();
+        //////GameController.instance.setTheAbilityTrans(true);
+        //////// isfulled_up=false;
+        //////lineRenderer.enabled = false;
+        //////bottleControllerRef.transform.GetChild(0).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 0;
+        //////bottleControllerRef.GetComponent<SpriteRenderer>().sortingOrder = 1;
+        int oldNumberOfColorsInBottle = numberOfColorsInBottle;
+
+        numberOfColorsInBottle -= numberOfColorsToTransfer;
         bottleControllerRef.numberOfColorsInBottle += numberOfColorsToTransfer;
 
-        //  Remove transferred colors from source bottle
+
         for (int i = 0; i < numberOfColorsToTransfer; i++)
         {
-            bottleColors[numberOfColorsInBottle + i] = Color.clear;   // top colors clear
+            bottleColors[oldNumberOfColorsInBottle - 1 - i] = Color.clear;
         }
 
-        //  Shift remaining colors downward in array
+        List<Color> tempColors = new List<Color>();
         for (int i = 0; i < 4; i++)
         {
-            if (bottleColors[i] == Color.clear)
+            if (bottleColors[i] != Color.clear)
             {
-                // bubble up next colors
-                for (int j = i; j < 3; j++)
-                {
-                    bottleColors[j] = bottleColors[j + 1];
-                }
-                bottleColors[3] = Color.clear;  // last always clear
+                tempColors.Add(bottleColors[i]);
             }
         }
 
-        //  Update top color and shader
-        UpdateColorsOnShader();
+        for (int i = 0; i < 4; i++)
+        {
+            if (i < tempColors.Count)
+            {
+                bottleColors[i] = tempColors[i]; 
+            }
+            else
+            {
+                bottleColors[i] = Color.clear; 
+            }
+        }
+
+
+        // 4. Update top color and shader
+        UpdateColorsOnShader();
         UpadateTopColorValues();
 
+        bottleMaskSR.material.SetFloat("_FillAmount", fillamounts[numberOfColorsInBottle]);
+        bottleControllerRef.bottleMaskSR.material.SetFloat("_FillAmount", fillamounts[bottleControllerRef.numberOfColorsInBottle]);
 
         bottleControllerRef.is_ref_full();
 
-        //after filling all the bottle now desable line rendrer 
+        //after filling all the bottle now desable line rendrer 
 
-        ///****************///////
-        StopPouringSound();
-        GameController.instance.setTheAbilityTrans(true);
-        // isfulled_up=false;
-        lineRenderer.enabled = false;
+        ///****************///////
+        StopPouringSound();
+        //GameController.instance.setTheAbilityTrans(true);
+        // isfulled_up=false;
+        lineRenderer.enabled = false;
         bottleControllerRef.transform.GetChild(0).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 0;
         bottleControllerRef.GetComponent<SpriteRenderer>().sortingOrder = 1;
-
 
 
         StartCoroutine(RotateBottleBack());
@@ -475,7 +566,7 @@ public class BottleController : MonoBehaviour
         transform.eulerAngles = new Vector3(0, 0, angleValue);
         bottleMaskSR.material.SetFloat("_SARM", ScaleAndRotationMultiplierCureve.Evaluate(angleValue));
 
-
+        bottleMaskSR.material.SetFloat("_FillAmount", fillamounts[numberOfColorsInBottle]);//////////
         StartCoroutine(MoveBottleBack());
 
     }

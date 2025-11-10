@@ -178,8 +178,8 @@ public class LevleGeneartor : MonoBehaviour
     {
         int currentlevelNumber = currentlevelindex;
         //update level text;
-        levelNumber.text = "Level " + currentlevelNumber;
-        levelNumber_winPanel.text = "" + currentlevelNumber;
+        levelNumber.text = "lvl " + currentlevelNumber;
+        levelNumber_winPanel.text = " " + currentlevelNumber;
 
         level_difficulty_txt.text = currentCategory.ToString();
 

@@ -19,7 +19,7 @@ public class GameScManger : MonoBehaviour
     public AudioListener mainLisitner_audio;
     public ParticleSystem winParticle;
     public ParticleSystem winSkyshot;
-
+    public GameObject bgCanvasPanel;
     public GameObject canvas;
     public GameObject gameUIBtn;
     public GameObject levelnCoin;
@@ -62,7 +62,7 @@ public class GameScManger : MonoBehaviour
         Click_sound = generalGameSettings.click_sound;
 
         Screen.orientation = ScreenOrientation.Portrait;
-
+        bgCanvasPanel.SetActive(false);
         winPanel.SetActive(false);
         notEnoughGames.SetActive(false);
         addCoinsAfterBottleFilled.SetActive(false);
@@ -371,7 +371,6 @@ public class GameScManger : MonoBehaviour
 
         //winPanel.SetActive(true);
         StartCoroutine(PopupComplete());
-        winSkyshot.gameObject.SetActive(true);
         LevleGeneartor.instance.openTheWinsLevel();
 
         game_AudioSOurce.clip = winSound;
@@ -382,9 +381,12 @@ public class GameScManger : MonoBehaviour
     IEnumerator PopupComplete()
     {
         yield return new WaitForSeconds(0.7f);
+        bgCanvasPanel.SetActive(true);
         winPanel.SetActive(true);
         uitween.instance.StarsAnim();
         winParticle.gameObject.SetActive(true);
+        winSkyshot.gameObject.SetActive(true);
+        winSkyshot.Play();
         canvas.SetActive(true);
         gameUIBtn.gameObject.SetActive(false);
         levelnCoin.SetActive(false);

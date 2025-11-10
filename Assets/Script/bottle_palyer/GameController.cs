@@ -57,7 +57,8 @@ public class GameController : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0) && IsPointerOverUIObject() == false)
         {
-
+            if (is_transform_avilibal == false) return;
+            if (FirstBottle != null && FirstBottle.isMoving == true) return;
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector2 mousePos2D = new Vector2(mousePos.x, mousePos.y);
 
