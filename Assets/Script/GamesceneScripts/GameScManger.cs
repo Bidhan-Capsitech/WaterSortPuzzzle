@@ -21,7 +21,7 @@ public class GameScManger : MonoBehaviour
     public ParticleSystem winSkyshot;
     public GameObject bgCanvasPanel;
     public GameObject canvas;
-    public GameObject gameUIBtn;
+    public GameObject gameUIBtn, footerBtn;
     public GameObject levelnCoin;
     // ui buttons
     public Button sound_BTN, add_bottle_btn;
@@ -70,6 +70,8 @@ public class GameScManger : MonoBehaviour
         winSkyshot.gameObject.SetActive(false);
         canvas.SetActive(false);
         gameUIBtn.gameObject.SetActive(true);
+        footerBtn.gameObject.SetActive(true);
+
         levelnCoin.SetActive(true);
         // ads 
         // GameAds.instance.loadInterstitialAd();
@@ -389,6 +391,7 @@ public class GameScManger : MonoBehaviour
         winSkyshot.Play();
         canvas.SetActive(true);
         gameUIBtn.gameObject.SetActive(false);
+        footerBtn.gameObject.SetActive(false);
         levelnCoin.SetActive(false);
     }
 

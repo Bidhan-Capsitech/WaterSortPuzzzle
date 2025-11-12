@@ -1405,6 +1405,7 @@ MonoBehaviour:
   bgCanvasPanel: {fileID: 1335156615}
   canvas: {fileID: 4531933172770694525}
   gameUIBtn: {fileID: 1721353019}
+  footerBtn: {fileID: 836358306}
   levelnCoin: {fileID: 271422903}
   sound_BTN: {fileID: 0}
   add_bottle_btn: {fileID: 1300909882}
@@ -3430,7 +3431,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 3837035114084522266, guid: 653f6ad0e58187246b3ca913cdef1d5b, type: 3}
+  m_Sprite: {fileID: 2715133130932923597, guid: 0d027d48b9226394989eb1dac34a91d4, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
